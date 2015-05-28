@@ -385,7 +385,21 @@ static void cancel_delayed_block(CWDelayedBlockHandle delayedHandle)
     self.statusBarView = [[UIView alloc] initWithFrame:[self getNotificationLabelFrame]];
     self.statusBarView.clipsToBounds = YES;
     if (self.notificationAnimationType == CWNotificationAnimationTypeReplace) {
-        UIView *statusBarImageView = [[UIScreen mainScreen] snapshotViewAfterScreenUpdates:YES];
+        
+        UIImage *snapShot;
+        for (UIWindow *window in [[UIApplication sharedApplication] windows])
+        {
+            if (![window respondsToSelector:@selector(screen)] || [window screen] == [UIScreen mainScreen])
+            {
+                UIGraphicsBeginImageContextWithOptions(window.bounds.size, NO, 0);
+                [window.layer renderInContext:UIGraphicsGetCurrentContext()];
+                snapShot = UIGraphicsGetImageFromCurrentImageContext();
+                UIGraphicsEndImageContext();
+            }
+        }
+        
+        UIImageView *statusBarImageView = [[UIImageView alloc] initWithImage: snapShot];
+
         [self.statusBarView addSubview:statusBarImageView];
     }
     [self.notificationWindow.rootViewController.view addSubview:self.statusBarView];
